@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
 use App\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class GroupController extends Controller
+class GroupsController extends Controller
 {
     public function __construct()
     {
@@ -21,7 +22,11 @@ class GroupController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::user();
+        $groups = Group::all();
+
+        // dd($groups);
+        return view('groups.index', compact('user', 'groups'));
     }
 
     /**
@@ -29,9 +34,9 @@ class GroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(User $user)
     {
-        return view ('groups.create');
+        return view('groups.create', ['user' => $user]);
     }
 
     /**
@@ -44,6 +49,7 @@ class GroupController extends Controller
     {
         $group = new Group;
         $group->name = $request->name;
+        $group->create_user_id = $request->user()->id;
         $group->group_img = $request->group_img;
 
           //ファイルが選択されていればs3へアップロード,post_imgカラムにパスを保存
@@ -51,12 +57,16 @@ class GroupController extends Controller
             // MEMO: リサイズ処理（GD, Imagemagick）
             // Service層を導入してImageServiceクラスの関数に移す
             // 入力：$request->file('post_img')、返り値：S3上の画像パス
-            $group->group_img = Storage::disk(config('filesystems.default'))->putFile('/groop_img', $request->file('group_img'), 'public');
+            $group->group_img = Storage::disk(config('filesystems.default'))->putFile('/group_img', $request->file('group_img'), 'public');
         } else {
             $request->group_img = null;
         }
 
         // dd(Storage::disk(config('s3'))->url($post->post_img));
+        // dd($group);
+        $group->save();
+
+        return back();
     }
 
     /**
@@ -67,7 +77,11 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        //
+        $users = $group->users();
+
+        // dd($users);
+
+        return view('groups.show', compact('users', 'group'));
     }
 
     /**
@@ -101,6 +115,10 @@ class GroupController extends Controller
      */
     public function destroy(Group $group)
     {
-        //
+        if (Auth::id() === $group->user_id) {
+            $group->delete();
+        }
+
+        return redirect('/groups');
     }
 }

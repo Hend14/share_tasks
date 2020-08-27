@@ -19,4 +19,8 @@ Auth::routes();
 
 // Route::get('/home', 'HomeController@index')->name('home');
 
-Route::get('/user', 'UserController@show');
+Route::get('users/{$user->id}', 'UsersController@show')->name('users');
+
+Route::resource('groups', 'GroupsController');
+
+Route::resource('members', 'MembersController');

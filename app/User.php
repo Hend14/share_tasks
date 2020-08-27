@@ -31,4 +31,14 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Group');
     }
+
+    public function joinGroup($groupId)
+    {
+        $this->groups()->attach($groupId);
+    }
+
+    public function leaveGroup($groupId)
+    {
+        $this->groups()->dettach($groupId);
+    }
 }

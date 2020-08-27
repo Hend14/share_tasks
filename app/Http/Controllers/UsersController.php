@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Group;
 
-class UserController extends Controller
+class UsersController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -47,9 +47,9 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $group = $user->groups();
+        $groups = $user->groups();
 
-        return view('users.show', compact('user', 'group'));
+        return view('users.show', compact('user', 'groups'));
     }
 
     /**

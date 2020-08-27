@@ -1,8 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-
-        <div class="title m-b-md">
-            ShareTasks
-        </div>
+    @if (Auth::check())
+    <p>{{ Auth::user()->name }}</p>
+    <a href="/users/{$user->id}">ID:{{ Auth::user()->id }} ページへ</a>
+    @else
+    <h1>Share Tasks トップページ</h1>
+    @endif
 @endsection
